@@ -1,0 +1,77 @@
+/* App.css */
+
+.App {
+  overflow: auto;
+  padding: 10px;
+  text-align: center;
+  color: #0a6983;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+/* Header */
+.blockly-header {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #005a8d;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Blockly Workspace Div */
+#blocklyDiv {
+  height: 480px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin: 0 auto;
+  background-color: #f8f9fa;
+  overflow: auto;
+}
+
+/* Responsive adjustment */
+@media (max-width: 600px) {
+  #blocklyDiv {
+    height: 350px;
+  }
+
+  .blockly-header {
+    font-size: 20px;
+  }
+
+  .app-layout {
+    flex-direction: column;
+  }
+}
+
+/* App layout to arrange Blockly and Output side by side */
+.app-layout {
+  display: flex;
+  flex-direction: row; /* side-by-side */
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Shared style for blocks */
+.workspace, .simulator, .code-display {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  min-width: 300px;
+}
+
+/* Generated Code Display */
+.code-display pre {
+  background-color: #222;
+  color: #0f0;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+  font-family: monospace;
+  height: 350px;
+}
