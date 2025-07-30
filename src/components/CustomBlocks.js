@@ -1,7 +1,7 @@
 import * as Blockly from 'blockly/core';
 import {javascriptGenerator}  from 'blockly/javascript';
 
-
+Blockly.Arduino = new Blockly.Generator('Arduino');
 
 Blockly.Blocks['turn_red'] = {
   init: function () {
@@ -54,4 +54,24 @@ javascriptGenerator.forBlock['turn_yellow'] = () => 'turn_yellow();\n';
 javascriptGenerator.forBlock['wait_seconds'] = (block) => {
   const value = javascriptGenerator.valueToCode(block, 'SECONDS', javascriptGenerator.ORDER_NONE) || '0';
   return `wait_seconds(${value}* 1000);\n`;
+};
+
+
+
+Blockly.Arduino['turn_red'] = function (block) {
+  return 'digitalWrite(2, HIGH);\n';
+};
+
+Blockly.Arduino['turn_yellow'] = function (block) {
+  return 'digitalWrite(4, HIGH);\n';
+};
+
+Blockly.Arduino['turn_green'] = function (block) {
+  return 'digitalWrite(3, HIGH);\n';
+};
+
+Blockly.Arduino['wait_seconds'] = function (block) {
+  const seconds = Blockly.Arduino.valueToCode(block, 'SECONDS', Blockly.Arduino.ORDER_NONE) || '1';
+  const milliseconds = `${seconds} * 1000`;
+  return `delay(${milliseconds});\n`;
 };
