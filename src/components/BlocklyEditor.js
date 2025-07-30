@@ -52,8 +52,8 @@ const BlocklyEditor = ({ setGeneratedCode }) => {
       });
     }
 
-    workspaceRef.current.addChangeListener(() => {
-      const codeFromBlocks = Blockly.Arduino.workspaceToCode(workspaceRef.current);
+   const onWorkspaceChange = () => {
+     const codeFromBlocks = javascriptGenerator.workspaceToCode(workspaceRef.current);
 
       const fullCode = `
 void setup() {
@@ -67,7 +67,7 @@ ${codeFromBlocks}
 }
 `;
       setGeneratedCode(fullCode);
-    });
+    };
 
 
     // Cleanup on unmount
@@ -127,7 +127,6 @@ ${codeFromBlocks}
           <block type="math_arithmetic" />
         </category>
       </xml>
-
     </div>
   );
 };
