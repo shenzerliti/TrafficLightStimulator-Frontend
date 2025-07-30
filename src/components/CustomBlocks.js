@@ -1,6 +1,5 @@
 import * as Blockly from 'blockly/core';
 import {javascriptGenerator}  from 'blockly/javascript';
-
 Blockly.Arduino = new Blockly.Generator('Arduino');
 
 Blockly.Blocks['turn_red'] = {
