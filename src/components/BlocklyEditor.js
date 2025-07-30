@@ -1,11 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import * as Blockly from 'blockly/core';
-import { javascriptGenerator } from 'blockly/javascript';
-import 'blockly/msg/en';
+import { javascriptGenerator } from 'blockly/javascript'; // For internal JS simulation
 import 'blockly/blocks';
-import './CustomBlocks';
-
-
+import 'blockly/msg/en';
+import './CustomBlocks'; // Make sure this file defines your custom blocks
 
 const BlocklyEditor = ({ setGeneratedCode }) => {
   const blocklyDiv = useRef(null);
@@ -13,12 +11,10 @@ const BlocklyEditor = ({ setGeneratedCode }) => {
   const workspaceRef = useRef(null);
 
   useEffect(() => {
-    // Dispose any existing workspace before injecting a new one
     if (workspaceRef.current) {
       workspaceRef.current.dispose();
     }
 
-    // Inject Blockly workspace
     if (blocklyDiv.current && toolbox.current) {
       workspaceRef.current = Blockly.inject(blocklyDiv.current, {
         toolbox: toolbox.current,
@@ -26,15 +22,34 @@ const BlocklyEditor = ({ setGeneratedCode }) => {
 
       const workspace = workspaceRef.current;
 
-      // Update generated code when blocks change
       const onWorkspaceChange = () => {
-        const code = javascriptGenerator.workspaceToCode(workspace);
-        setGeneratedCode(code);
+        // For live JS preview (optional)
+        const jsCode = javascriptGenerator.workspaceToCode(workspace);
+
+        // Generate Arduino code manually
+        let arduinoCode = '';
+        const blocks = workspace.getTopBlocks(true);
+        blocks.forEach((block) => {
+          arduinoCode += generateArduinoCode(block);
+        });
+
+        const fullCode = `
+void setup() {
+  pinMode(2, OUTPUT); // Red
+  pinMode(3, OUTPUT); // Green
+  pinMode(4, OUTPUT); // Yellow
+}
+
+void loop() {
+${arduinoCode}
+}
+        `.trim();
+
+        setGeneratedCode(fullCode); // ✅ Send code to parent to display
       };
 
       workspace.addChangeListener(onWorkspaceChange);
 
-      // Highlight invalid blocks and prevent them from snapping
       workspace.addChangeListener((e) => {
         if (
           e.type === Blockly.Events.BLOCK_CREATE ||
@@ -42,7 +57,7 @@ const BlocklyEditor = ({ setGeneratedCode }) => {
         ) {
           const block = workspace.getBlockById(e.blockId);
           if (block && !isValidBlock(block)) {
-            block.setColour('#ff0000'); // Red for invalid
+            block.setColour('#ff0000');
             block.setWarningText('Invalid block!');
           } else if (block) {
             block.setColour(block.originalColour || block.getColour());
@@ -52,25 +67,6 @@ const BlocklyEditor = ({ setGeneratedCode }) => {
       });
     }
 
-   const onWorkspaceChange = () => {
-     const codeFromBlocks = javascriptGenerator.workspaceToCode(workspaceRef.current);
-
-      const fullCode = `
-void setup() {
-  pinMode(2, OUTPUT); // Red
-  pinMode(3, OUTPUT); // Green
-  pinMode(4, OUTPUT); // Yellow
-}
-
-void loop() {
-${codeFromBlocks}
-}
-`;
-      setGeneratedCode(fullCode);
-    };
-
-
-    // Cleanup on unmount
     return () => {
       if (workspaceRef.current && !workspaceRef.current.isDisposed?.()) {
         workspaceRef.current.dispose();
@@ -79,7 +75,7 @@ ${codeFromBlocks}
     };
   }, [setGeneratedCode]);
 
-  // ✅ Validation function for allowed blocks
+  // ✅ Define allowed block types
   const isValidBlock = (block) => {
     const allowedTypes = [
       'turn_red',
@@ -93,6 +89,35 @@ ${codeFromBlocks}
     return allowedTypes.includes(block.type);
   };
 
+  // ✅ Your manual Arduino code generator function
+  const generateArduinoCode = (block) => {
+    switch (block.type) {
+      case 'turn_red':
+        return '  digitalWrite(2, HIGH);\n  digitalWrite(3, LOW);\n  digitalWrite(4, LOW);\n  delay(1000);\n';
+      case 'turn_green':
+        return '  digitalWrite(2, LOW);\n  digitalWrite(3, HIGH);\n  digitalWrite(4, LOW);\n  delay(1000);\n';
+      case 'turn_yellow':
+        return '  digitalWrite(2, LOW);\n  digitalWrite(3, LOW);\n  digitalWrite(4, HIGH);\n  delay(1000);\n';
+      case 'wait_seconds':
+        const seconds = block.getFieldValue('SECONDS') || 1;
+        return `  delay(${seconds * 1000});\n`;
+      case 'controls_repeat_ext': {
+        const times = Blockly.JavaScript.valueToCode(block, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || '1';
+        const statements = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+        return `  for (int i = 0; i < ${times}; i++) {\n${statements}}\n`;
+      }
+      case 'controls_whileUntil': {
+        const mode = block.getFieldValue('MODE');
+        const condition = Blockly.JavaScript.valueToCode(block, 'BOOL', Blockly.JavaScript.ORDER_NONE) || 'false';
+        const body = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+        return mode === 'WHILE'
+          ? `  while (${condition}) {\n${body}}\n`
+          : `  do {\n${body}} while (!(${condition}));\n`;
+      }
+      default:
+        return '';
+    }
+  };
 
   return (
     <div className="blockly-editor">
@@ -105,26 +130,21 @@ ${codeFromBlocks}
       <xml ref={toolbox} style={{ display: 'none' }}>
         <category name="Loops" colour="green">
           <block type="controls_repeat_ext" />
-          <block type="controls_if" />
-          <block type="controls_whileUntil"/>
+          <block type="controls_whileUntil" />
         </category>
-         <sep gap="30"/>
+        <sep gap="30" />
         <category name="Logic" colour="blue">
-            <block type="logic_compare"></block>
-            <block type="logic_operation"></block>
-           <block type="wait_seconds" />
+          <block type="wait_seconds" />
         </category>
-        <sep gap="30"/>
-        <category name="Traffic Light" colour="red" >
+        <sep gap="30" />
+        <category name="Traffic Light" colour="red">
           <block type="turn_red" />
           <block type="turn_green" />
           <block type="turn_yellow" />
-         
         </category>
-        <sep gap="30"/>
-         <category name="Math" colour="purple" >
+        <sep gap="30" />
+        <category name="Math" colour="purple">
           <block type="math_number" />
-          <block type="math_arithmetic" />
         </category>
       </xml>
     </div>
