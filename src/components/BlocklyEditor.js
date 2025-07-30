@@ -102,14 +102,14 @@ ${arduinoCode}
         const seconds = block.getFieldValue('SECONDS') || 1;
         return `  delay(${seconds * 1000});\n`;
       case 'controls_repeat_ext': {
-        const times = Blockly.JavaScript.valueToCode(block, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || '1';
-        const statements = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+        const times = javascriptGenerator.valueToCode(block, 'TIMES', javascriptGenerator.ORDER_ATOMIC) || '1';
+        const statements = javascriptGenerator.statementToCode(block, 'DO') || '';
         return `  for (int i = 0; i < ${times}; i++) {\n${statements}}\n`;
       }
       case 'controls_whileUntil': {
         const mode = block.getFieldValue('MODE');
-        const condition = Blockly.JavaScript.valueToCode(block, 'BOOL', Blockly.JavaScript.ORDER_NONE) || 'false';
-        const body = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+        const condition = javascriptGenerator.valueToCode(block, 'BOOL', Blockly.JavaScript.ORDER_NONE) || 'false';
+        const body = javascriptGenerator.statementToCode(block, 'DO') || '';
         return mode === 'WHILE'
           ? `  while (${condition}) {\n${body}}\n`
           : `  do {\n${body}} while (!(${condition}));\n`;
