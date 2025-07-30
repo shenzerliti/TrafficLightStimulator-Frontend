@@ -5,8 +5,6 @@ import 'blockly/msg/en';
 import 'blockly/blocks';
 import './CustomBlocks';
 
-const arduinoCode = Blockly.Arduino.workspaceToCode(workspace);
-setGeneratedCode(arduinoCode);
 
 
 const BlocklyEditor = ({ setGeneratedCode }) => {
@@ -53,6 +51,24 @@ const BlocklyEditor = ({ setGeneratedCode }) => {
         }
       });
     }
+
+    workspaceRef.current.addChangeListener(() => {
+      const codeFromBlocks = Blockly.Arduino.workspaceToCode(workspaceRef.current);
+
+      const fullCode = `
+void setup() {
+  pinMode(2, OUTPUT); // Red
+  pinMode(3, OUTPUT); // Green
+  pinMode(4, OUTPUT); // Yellow
+}
+
+void loop() {
+${codeFromBlocks}
+}
+`;
+      setGeneratedCode(fullCode);
+    });
+
 
     // Cleanup on unmount
     return () => {
