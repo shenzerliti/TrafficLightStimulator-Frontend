@@ -5,6 +5,10 @@ import 'blockly/msg/en';
 import 'blockly/blocks';
 import './CustomBlocks';
 
+const arduinoCode = Blockly.Arduino.workspaceToCode(workspace);
+setGeneratedCode(arduinoCode);
+
+
 const BlocklyEditor = ({ setGeneratedCode }) => {
   const blocklyDiv = useRef(null);
   const toolbox = useRef(null);
