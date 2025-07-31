@@ -1,7 +1,6 @@
 import * as Blockly from 'blockly/core';
 import {javascriptGenerator}  from 'blockly/javascript';
 
-Blockly.Arduino.ORDER_ATOMIC = 0;
 
 Blockly.Blocks['turn_red'] = {
   init: function () {
@@ -39,11 +38,12 @@ Blockly.Blocks['wait_seconds'] = {
   init: function () {
     this.appendValueInput("SECONDS")
       .setCheck("Number")
-      .appendField("Wait (seconds)");
+      .appendField("wait for");
+    this.appendDummyInput()
+      .appendField("seconds");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(210);
-  
+    this.setColour(230);
   }
 };
 
@@ -51,8 +51,11 @@ javascriptGenerator.forBlock['turn_red'] = () => 'turn_red();\n';
 javascriptGenerator.forBlock['turn_green'] = () => 'turn_green();\n';
 javascriptGenerator.forBlock['turn_yellow'] = () => 'turn_yellow();\n';
 
-javascriptGenerator.forBlock['wait_seconds'] = (block) => {
-  const value = javascriptGenerator.valueToCode(block, 'SECONDS', javascriptGenerator.ORDER_NONE) || '0';
-  return `wait_seconds(${value}* 1000);\n`;
+javascriptGenerator.forBlock['wait_seconds'] = function(block, generator) {
+  const seconds = generator.valueToCode(block, 'SECONDS', javascriptGenerator.ORDER_NONE
+) || '0';
+  const milliseconds = `${seconds} * 1000`;
+  return `await wait_seconds(${milliseconds});\n`;
 };
+
 

@@ -3,7 +3,7 @@
   display: flex;
   justify-content: space-around;
   align-items: stretch;
-  padding: 10px;
+  padding: 2px;
   gap: 30px;
   flex-wrap: wrap; /* Optional: ensures responsiveness */
 }
@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 100px;
+  min-width: 50px;
   background-color: #ffffff;
   
 }
@@ -22,7 +22,6 @@
   flex-direction: column;
   align-items: center;
   margin: 20px auto;
-  padding: 10px;
   background-color: #030303;
   border-radius: 10px;
   width: 120px;
@@ -37,15 +36,15 @@
 }
 
 .light.on.red {
-  background-color: red;
+  background-color: rgb(252, 21, 21);
 }
 
 .light.on.yellow {
-  background-color: yellow;
+  background-color: rgb(255, 255, 9);
 }
 
 .light.on.green {
-  background-color: green;
+  background-color: rgb(7, 209, 7);
 }
 
 .run-button {

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import * as Blockly from 'blockly/core';
-import { javascriptGenerator } from 'blockly/javascript'; // For internal JS simulation
+import { javascriptGenerator } from 'blockly/javascript';
 import 'blockly/blocks';
 import 'blockly/msg/en';
-import './CustomBlocks'; // Make sure this file defines your custom blocks
+import './CustomBlocks'; // Your custom block definitions
 
 const BlocklyEditor = ({ setGeneratedCode }) => {
   const blocklyDiv = useRef(null);
@@ -16,55 +16,26 @@ const BlocklyEditor = ({ setGeneratedCode }) => {
     }
 
     if (blocklyDiv.current && toolbox.current) {
-      workspaceRef.current = Blockly.inject(blocklyDiv.current, {
+      // ✅ Correct injection
+      const workspace = Blockly.inject(blocklyDiv.current, {
         toolbox: toolbox.current,
       });
+      workspaceRef.current = workspace;
 
-      const workspace = workspaceRef.current;
-
-      const onWorkspaceChange = () => {
-        // For live JS preview (optional)
-        const jsCode = javascriptGenerator.workspaceToCode(workspace);
-
-        // Generate Arduino code manually
-        let arduinoCode = '';
+      // ✅ Live Arduino code generation
+      const updateCode = () => {
         const blocks = workspace.getTopBlocks(true);
+        let code = '';
         blocks.forEach((block) => {
-          arduinoCode += generateArduinoCode(block);
+          if (isValidBlock(block)) {
+            code += generateArduinoCode(block);
+          }
         });
-
-        const fullCode = `
-void setup() {
-  pinMode(2, OUTPUT); // Red
-  pinMode(3, OUTPUT); // Green
-  pinMode(4, OUTPUT); // Yellow
-}
-
-void loop() {
-${arduinoCode}
-}
-        `.trim();
-
-        setGeneratedCode(fullCode); // ✅ Send code to parent to display
+        setGeneratedCode(code);
       };
 
-      workspace.addChangeListener(onWorkspaceChange);
-
-      workspace.addChangeListener((e) => {
-        if (
-          e.type === Blockly.Events.BLOCK_CREATE ||
-          e.type === Blockly.Events.BLOCK_MOVE
-        ) {
-          const block = workspace.getBlockById(e.blockId);
-          if (block && !isValidBlock(block)) {
-            block.setColour('#ff0000');
-            block.setWarningText('Invalid block!');
-          } else if (block) {
-            block.setColour(block.originalColour || block.getColour());
-            block.setWarningText(null);
-          }
-        }
-      });
+      updateCode(); // Initial
+      workspace.addChangeListener(updateCode); // On change
     }
 
     return () => {
@@ -75,7 +46,7 @@ ${arduinoCode}
     };
   }, [setGeneratedCode]);
 
-  // ✅ Define allowed block types
+  // ✅ Allowed block types
   const isValidBlock = (block) => {
     const allowedTypes = [
       'turn_red',
@@ -89,7 +60,7 @@ ${arduinoCode}
     return allowedTypes.includes(block.type);
   };
 
-  // ✅ Your manual Arduino code generator function
+  // ✅ Custom Arduino-style generator
   const generateArduinoCode = (block) => {
     switch (block.type) {
       case 'turn_red':
@@ -108,7 +79,7 @@ ${arduinoCode}
       }
       case 'controls_whileUntil': {
         const mode = block.getFieldValue('MODE');
-        const condition = javascriptGenerator.valueToCode(block, 'BOOL', Blockly.JavaScript.ORDER_NONE) || 'false';
+        const condition = javascriptGenerator.valueToCode(block, 'BOOL', javascriptGenerator.ORDER_NONE) || 'false';
         const body = javascriptGenerator.statementToCode(block, 'DO') || '';
         return mode === 'WHILE'
           ? `  while (${condition}) {\n${body}}\n`
