@@ -22,6 +22,16 @@ const BlocklyEditor = ({ setGeneratedCode }) => {
       });
       workspaceRef.current = workspace;
 
+// Prevent scroll jump when dropdown or input appears
+       Blockly.WidgetDiv.show = (function(originalFn) {
+      return function() {
+        const scrollY = window.scrollY;
+        originalFn.apply(this, arguments);
+        window.scrollTo(0, scrollY);
+      };
+    })(Blockly.WidgetDiv.show);
+    
+
       // ✅ Live Arduino code generation
       const updateCode = () => {
         const blocks = workspace.getTopBlocks(true);

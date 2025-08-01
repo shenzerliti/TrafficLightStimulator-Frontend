@@ -1,5 +1,8 @@
 /* App.css */
-
+html, body{
+  scroll-behavior: auto;
+  overflow-anchor: none;
+}
 .App {
   overflow: auto;
   padding: 10px;
@@ -28,6 +31,8 @@
   margin: 0 auto;
   background-color: #f8f9fa;
   overflow: auto;
+  min-height: 350px;
+  position: relative;
 }
 
 /* Responsive adjustment */
@@ -42,6 +47,7 @@
 
   .app-layout {
     flex-direction: column;
+    align-items: center;
   }
 }
 

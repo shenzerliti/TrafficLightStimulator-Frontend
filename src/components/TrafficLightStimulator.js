@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
 import './TrafficLightStimulator.css';
+import axios from 'axios';
 
 const TrafficLightStimulator = ({ generatedCode, setGeneratedCode }) => {
   const [light, setLight] = useState('');
@@ -10,6 +11,16 @@ const TrafficLightStimulator = ({ generatedCode, setGeneratedCode }) => {
     // Generate code from the Blockly workspace
     const code = javascriptGenerator.workspaceToCode(Blockly.getMainWorkspace());
     setGeneratedCode(code); // Show generated code in UI
+
+    try {
+      await axios.post('http://localhost:5000/api/codes', {
+        code: code
+      });
+      console.log('Code saved to DB successfully');
+    } catch (error) {
+      console.error('Error saving code to DB:', error);
+    }
+
 
     // Define async helper functions and expose them in a sandbox
     const sandbox = {
