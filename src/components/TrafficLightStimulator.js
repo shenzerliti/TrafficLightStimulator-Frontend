@@ -13,7 +13,7 @@ const TrafficLightStimulator = ({ generatedCode, setGeneratedCode }) => {
     setGeneratedCode(code); // Show generated code in UI
 
     try {
-      await axios.post('http://localhost:5000/api/codes', {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/codes`, {
         code: code
       });
       console.log('Code saved to DB successfully');
