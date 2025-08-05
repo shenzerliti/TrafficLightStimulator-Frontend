@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.css": "/TrafficLightStimulator-Frontend/static/css/main.1986e519.css",
+    "main.js": "/TrafficLightStimulator-Frontend/static/js/main.bafafeb6.js",
+    "static/js/206.ed2f3d44.chunk.js": "/TrafficLightStimulator-Frontend/static/js/206.ed2f3d44.chunk.js",
+    "index.html": "/TrafficLightStimulator-Frontend/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.1986e519.css",
+    "static/js/main.bafafeb6.js"
+  ]
+}
